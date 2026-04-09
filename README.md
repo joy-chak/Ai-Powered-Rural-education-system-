@@ -2,7 +2,7 @@
 
 This project is an **n8n workflow** that acts as an AI-powered tutor for students with limited internet access. It generates lessons, evaluates answers, and tracks student progress.
 
----
+
 
 ##  Features
 
@@ -13,7 +13,7 @@ This project is an **n8n workflow** that acts as an AI-powered tutor for student
 -  Tracks student progress (score, attempts, level)
 -  Adapts difficulty (Beginner → Intermediate → Advanced)
 
----
+
 
 ##  Tech Stack
 
@@ -21,7 +21,7 @@ This project is an **n8n workflow** that acts as an AI-powered tutor for student
 - Google Gemini (AI model)
 - Data Tables (student database)
 
----
+
 
 ##  Workflow Overview
 
