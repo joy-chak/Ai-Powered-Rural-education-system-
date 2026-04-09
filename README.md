@@ -1,4 +1,4 @@
-# AI Tutor for Rural Students
+# AI Tutor for Rural Students(Workflow)
 
 This project is an **n8n workflow** that acts as an AI-powered tutor for students with limited internet access. It generates lessons, evaluates answers, and tracks student progress.
 
