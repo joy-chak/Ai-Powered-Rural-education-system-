@@ -1,4 +1,4 @@
-# 📚 AI Tutor for Rural Students
+# AI Tutor for Rural Students
 
 This project is an **n8n workflow** that acts as an AI-powered tutor for students with limited internet access. It generates lessons, evaluates answers, and tracks student progress.
 
@@ -15,7 +15,7 @@ This project is an **n8n workflow** that acts as an AI-powered tutor for student
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 - n8n (workflow automation)
 - Google Gemini (AI model)
@@ -23,7 +23,7 @@ This project is an **n8n workflow** that acts as an AI-powered tutor for student
 
 ---
 
-## 🔄 Workflow Overview
+##  Workflow Overview
 
 1. **Receive Input**
    - Student sends:
