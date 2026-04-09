@@ -1,0 +1,1006 @@
+{
+  "name": "AI Tutor for Rural Students(final)",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "student_id",
+              "name": "student_id",
+              "value": "={{ JSON.parse($json.chatInput).student_id }}",
+              "type": "string"
+            },
+            {
+              "id": "answer",
+              "name": "answer",
+              "value": "={{ JSON.parse($json.chatInput).answer}}",
+              "type": "string"
+            },
+            {
+              "id": "ef91fbf0-07eb-40a9-bee6-bbc5a2c68a00",
+              "name": "topic",
+              "value": "={{ JSON.parse($json.chatInput).topic}}",
+              "type": "string"
+            },
+            {
+              "id": "d0d2c723-2e99-454c-a77f-2fefaf09e3ae",
+              "name": "grade",
+              "value": "={{ JSON.parse($json.chatInput).grade}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4a50db19-4ed5-4946-9c20-cb4dc7ce6ca8",
+      "name": "Extract Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1840,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.answer }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              },
+              "id": "e48fa4e4-5913-4021-99fd-d2ad77cf5c71"
+            },
+            {
+              "id": "68d17278-68d4-4c4a-9e74-ddcd499f7308",
+              "leftValue": "={{ $json.student_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7db81b85-c241-40a7-90d4-b4af361fa543",
+      "name": "Check If Answer Provided",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -688,
+        -368
+      ]
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"is_correct\": {\n      \"type\": \"string\",\n      \"description\": \"Whether the answer is correct (yes/no)\"\n    },\n    \"explanation\": {\n      \"type\": \"string\",\n      \"description\": \"A brief 1-2 sentence explanation of why it is right or wrong\"\n    },\n    \"encouragement\": {\n      \"type\": \"string\",\n      \"description\": \"A supportive and encouraging remark\"\n    },\n    \"score\": {\n      \"type\": \"number\",\n      \"description\": \"Points awarded: 10 if correct, 5 if partially correct, 0 if incorrect\"\n    }\n  },\n  \"required\": [\n    \"is_correct\",\n    \"explanation\",\n    \"encouragement\",\n    \"score\"\n  ]\n}\n"
+      },
+      "id": "9c749407-87a7-42e9-bc51-f357e111550c",
+      "name": "Evaluation Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        288,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"lesson\": {\n      \"type\": \"string\",\n      \"description\": \"Brief explanation of the concept in 2-3 sentences\"\n    },\n    \"question\": {\n      \"type\": \"string\",\n      \"description\": \"A question to test understanding\"\n    },\n    \"correct_answer\": {\n      \"type\": \"string\",\n      \"description\": \"The correct answer to the question\"\n    },\n    \"difficulty\": {\n      \"type\": \"string\",\n      \"description\": \"The difficulty level (e.g. Beginner, Intermediate)\"\n    }\n  },\n  \"required\": [\n    \"lesson\",\n    \"question\",\n    \"correct_answer\",\n    \"difficulty\"\n  ]\n}\n"
+      },
+      "id": "c101da57-1b68-4b7d-bb8b-dad8bc4a41df",
+      "name": "Lesson Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response_message",
+              "name": "response_message",
+              "value": "=📚 **Lesson for {{ $(\"Merge Student Data\").item.json.student_name }}**\n\n{{ $json.last_lesson }}\n\n❓ **Question:**\n}\n\n💡 **How to answer:**\nSend a new request with:\n```json\n{\n  \"student_id\": \"{{ $(\"Merge Student Data\").item.json.student_id }}\",\n  \"answer\": \"your answer here\"\n}\n```",
+              "type": "string"
+            },
+            {
+              "id": "status",
+              "name": "status",
+              "value": "lesson_sent",
+              "type": "string"
+            },
+            {
+              "id": "student_id",
+              "name": "student_id",
+              "value": "={{ $(\"Merge Student Data\").item.json.student_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8ca1dc72-51d9-48ed-9abe-be84be6bb97c",
+      "name": "Prepare Lesson Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "Oembqh52JD4kVlD8",
+          "mode": "list",
+          "cachedResultName": "student_db",
+          "cachedResultUrl": "/projects/xBCuX2jaWpXxETBU/datatables/Oembqh52JD4kVlD8"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $json.student_id }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "id": "dd4f6ddf-81d7-45d6-9f97-18c8e68f60b6",
+      "name": "Retrieve Student Data",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -368,
+        -416
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "student_id",
+              "name": "student_id",
+              "value": "={{  $('Retrieve Student Data').item.json.id}}",
+              "type": "string"
+            },
+            {
+              "id": "new_total_score",
+              "name": "new_total_score",
+              "value": "={{ $(\"Retrieve Student Data\").item.json.total_score + $json.output.score }}",
+              "type": "number"
+            },
+            {
+              "id": "new_attempts",
+              "name": "new_attempts",
+              "value": "={{ $(\"Retrieve Student Data\").item.json.attempts + 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "new_difficulty",
+              "name": "new_difficulty",
+              "value": "={{ ($(\"Retrieve Student Data\").item.json.total_score + $json.score) < 50 ? \"Beginner\" : (($(\"Retrieve Student Data\").item.json.total_score + $json.score) < 80 ? \"Intermediate\" : \"Advanced\") }}",
+              "type": "string"
+            },
+            {
+              "id": "is_correct",
+              "name": "is_correct",
+              "value": "={{ $json.output.is_correct }}",
+              "type": "string"
+            },
+            {
+              "id": "explanation",
+              "name": "explanation",
+              "value": "={{ $json.output.explanation }}",
+              "type": "string"
+            },
+            {
+              "id": "encouragement",
+              "name": "encouragement",
+              "value": "={{ $json.output.encouragement }}",
+              "type": "string"
+            },
+            {
+              "id": "score_earned",
+              "name": "score_earned",
+              "value": "={{ $json.output.score }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "015b50b0-439e-418e-8b1c-49f74c389bb4",
+      "name": "Update Progress",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        608,
+        -544
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response_message",
+              "name": "response_message",
+              "value": "=🎓 **Answer Evaluation**\n\n{{ $(\"Update Progress\").item.json.explanation }}\n\n{{ $(\"Update Progress\").item.json.encouragement }}\n\n📊 **Your Progress:**\n✅ Score Earned: +{{ $(\"Update Progress\").item.json.score_earned }} points\n📈 Total Score: {{ $(\"Update Progress\").item.json.new_total_score }} points\n📚 Questions Answered: {{ $(\"Update Progress\").item.json.new_attempts }}\n🎯 Current Level: {{ $(\"Update Progress\").item.json.new_difficulty }}\n\n💬 **What's next?**\nSend a new request with your name and topic for another lesson!",
+              "type": "string"
+            },
+            {
+              "id": "status",
+              "name": "status",
+              "value": "feedback_sent",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cd48864b-8846-466d-9d75-3690d85d58e6",
+      "name": "Prepare Feedback",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "Oembqh52JD4kVlD8",
+          "mode": "list",
+          "cachedResultName": "student_db",
+          "cachedResultUrl": "/projects/xBCuX2jaWpXxETBU/datatables/Oembqh52JD4kVlD8"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $json.student_id }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "id": "599e47bd-a28c-4894-9fa1-4b7b6f527245",
+      "name": "Check Student Exists",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1504,
+        -224
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.id }}",
+              "operator": {
+                "type": "any",
+                "operation": "exists"
+              },
+              "id": "00bda99d-3830-4814-b43b-734232490be0"
+            },
+            {
+              "id": "5eefe4d8-98ab-4e62-92e4-1802c453a5db",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "29eb03ef-6e63-499f-869e-99eee637a0cb",
+      "name": "Is New Student?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1520,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "student_id",
+              "name": "student_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "student_name",
+              "name": "student_name",
+              "value": "={{ $json.student_name }}",
+              "type": "string"
+            },
+            {
+              "id": "grade",
+              "name": "grade",
+              "value": "={{ $json.grade }}",
+              "type": "string"
+            },
+            {
+              "id": "topic",
+              "name": "topic",
+              "value": "={{ $(\"Extract Input\").item.json.topic || $json.topic }}",
+              "type": "string"
+            },
+            {
+              "id": "difficulty_level",
+              "name": "difficulty_level",
+              "value": "={{ $json.difficulty_level }}",
+              "type": "string"
+            },
+            {
+              "id": "total_score",
+              "name": "total_score",
+              "value": "={{ $json.total_score }}",
+              "type": "number"
+            },
+            {
+              "id": "attempts",
+              "name": "attempts",
+              "value": "={{ $json.attempts }}",
+              "type": "number"
+            },
+            {
+              "id": "f2da2566-1465-4f41-a6c0-56ffc5b6b56c",
+              "name": "answer",
+              "value": "={{ $('Extract Input').item.json.answer }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d9a1352e-b029-496a-bcf9-bd0815942c17",
+      "name": "Prepare Existing Student",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1088,
+        -448
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "5780f184-35e9-4f35-8aea-26cc517dfb14",
+      "name": "Merge Student Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -912,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "Hw8R7rmWQFXZabSo",
+          "mode": "list",
+          "cachedResultName": "student_db",
+          "cachedResultUrl": "/projects/xBCuX2jaWpXxETBU/datatables/Hw8R7rmWQFXZabSo"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "student_id": "={{ $(\"Extract Input\").item.json.student_id || \"student_\" + Date.now() }}",
+            "student_name": "={{ $(\"Extract Input\").item.json.student_name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "student_id",
+              "displayName": "student_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "student_name",
+              "displayName": "student_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "optimizeBulk": false
+        }
+      },
+      "id": "6b4ffafa-f36f-457c-a14b-a3361313b6bf",
+      "name": "Create New Student",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1104,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "Oembqh52JD4kVlD8",
+          "mode": "list",
+          "cachedResultName": "student_db",
+          "cachedResultUrl": "/projects/xBCuX2jaWpXxETBU/datatables/Oembqh52JD4kVlD8"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "condition": "=eq",
+              "keyValue": "={{ $('Check If Answer Provided').item.json.student_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "total_score": 0,
+            "attempts": 0,
+            "last_lesson": "={{ $json.output.lesson }}",
+            "last_question": "={{ $json.output.question }}",
+            "correct_answer": "={{ $json.output.correct_answer }}",
+            "last_updated": "={{ $json.output.difficulty }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "student_name",
+              "displayName": "student_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "grade",
+              "displayName": "grade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "difficulty_level",
+              "displayName": "difficulty_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "total_score",
+              "displayName": "total_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "attempts",
+              "displayName": "attempts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "last_lesson",
+              "displayName": "last_lesson",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "last_question",
+              "displayName": "last_question",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "correct_answer",
+              "displayName": "correct_answer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "last_updated",
+              "displayName": "last_updated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "24ae199d-50bc-4219-970a-ca9ba5477ee9",
+      "name": "Save Lesson",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "student_db",
+        "columns": {
+          "column": [
+            {
+              "name": "student_id"
+            },
+            {
+              "name": "student_name"
+            },
+            {
+              "name": "grade"
+            },
+            {
+              "name": "topic"
+            },
+            {
+              "name": "difficulty_level"
+            },
+            {
+              "name": "total_score",
+              "type": "number"
+            },
+            {
+              "name": "attempts",
+              "type": "number"
+            },
+            {
+              "name": "last_lesson"
+            },
+            {
+              "name": "last_question"
+            },
+            {
+              "name": "correct_answer"
+            },
+            {
+              "name": "last_updated"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      },
+      "id": "9c3da9b1-b50b-4e13-a854-ec744f90e919",
+      "name": "Create Student Database",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -208
+      ],
+      "id": "e385cd2b-89ab-4c2e-8b78-bd96c2c0fc3c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EE8PYWX8y2oSPkp0",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a friendly AI tutor for rural students with limited internet access.\n\n**Student Profile:**\n- Name: {{ $json.student_name }}\n- Grade: {{ $json.grade }}\n- Topic: {{ $json.topic }}\n- Current Level: {{ $json.difficulty_level }}\n- Total Score: {{ $json.total_score }}\n- Questions Answered: {{ $json.attempts }}\n\n**Instructions:**\n1. Create a SHORT lesson (2-3 sentences) on the topic: {{ $json.topic }}\n2. Keep language SIMPLE and CLEAR for grade {{ $json.grade }}\n3. Ask ONE question to test understanding\n4. Adjust difficulty based on level: {{ $json.difficulty_level }}\n5. Make it mobile-friendly (short text)\n6. Use examples relevant to rural life (farming, nature, daily activities)\n\nBe encouraging and supportive!",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -192,
+        224
+      ],
+      "id": "28139bfe-9544-437c-99ef-bfbacfba9e30",
+      "name": "lesson",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a supportive tutor evaluating a student's answer.\n\n**Question:** {{ $json.last_question }}\n**Correct Answer:** {{ $json.correct_answer }}\n**Student Answer:** {{ $(\"Extract Input\").item.json.answer }}\n\n**Instructions:**\n1. Is the answer correct? (yes/no)\n2. Provide a brief explanation (1-2 sentences)\n3. Give encouragement\n4. Assign score: 10 points if correct, 5 if partially correct, 0 if incorrect\n\nKeep response SHORT and mobile-friendly!",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        48,
+        -560
+      ],
+      "id": "a79885b7-345a-49df-be10-73c311bb6082",
+      "name": "answer"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -1520,
+        -608
+      ],
+      "id": "98a051ad-fcec-4081-b696-886df1813598",
+      "name": "When chat message received",
+      "webhookId": "67d7fb0a-5bb6-49cc-b651-cc5425fcf59e"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.response_message }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        1136,
+        -256
+      ],
+      "id": "251736e5-cea8-4356-bb3d-1836d7f980da",
+      "name": "Chat",
+      "webhookId": "86522d6b-8f31-4c35-80b5-a1268882aa38"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Extract Input": {
+      "main": [
+        [
+          {
+            "node": "Check Student Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Answer Provided": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Student Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "lesson",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "answer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lesson Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "lesson",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Lesson Response": {
+      "main": [
+        [
+          {
+            "node": "Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Student Data": {
+      "main": [
+        [
+          {
+            "node": "answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Progress": {
+      "main": [
+        [
+          {
+            "node": "Create Student Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Feedback": {
+      "main": [
+        [
+          {
+            "node": "Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Student Exists": {
+      "main": [
+        [
+          {
+            "node": "Is New Student?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is New Student?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Existing Student",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create New Student",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Existing Student": {
+      "main": [
+        [
+          {
+            "node": "Merge Student Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Student Data": {
+      "main": [
+        [
+          {
+            "node": "Check If Answer Provided",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Student": {
+      "main": [
+        [
+          {
+            "node": "Merge Student Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Save Lesson": {
+      "main": [
+        [
+          {
+            "node": "Prepare Lesson Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Student Database": {
+      "main": [
+        [
+          {
+            "node": "Prepare Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "answer",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "lesson",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "lesson": {
+      "main": [
+        [
+          {
+            "node": "Save Lesson",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "answer": {
+      "main": [
+        [
+          {
+            "node": "Update Progress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Extract Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "339b33c1-7c3c-4e9c-8ec2-4d857b23c47b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1bf02b6ee4216e07b541a456aec2409c6b0f5fa732bae94af722f1954f1ab98b"
+  },
+  "id": "jJ03WDE82YPOnsxD",
+  "tags": []
+}
